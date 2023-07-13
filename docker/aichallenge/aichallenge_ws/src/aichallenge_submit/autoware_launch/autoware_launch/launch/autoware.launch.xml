@@ -64,10 +64,6 @@
     </include>
   </group>
 
-  <!-- System -->
-  <group if="$(var launch_system)">
-    <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_system_component.launch.xml"/>
-  </group>
 
   <!-- Map -->
   <group if="$(var launch_map)">
@@ -89,11 +85,6 @@
     <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_perception_component.launch.xml"/>
   </group>
 
-  <!-- Planning -->
-  <group if="$(var launch_planning)">
-    <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_planning_component.launch.xml"/>
-  </group>
-
   <!-- Control -->
   <group if="$(var launch_control)">
     <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_control_component.launch.xml"/>
@@ -108,4 +99,76 @@
   <group>
     <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(var rviz_config) -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)"/>
   </group>
+
+
+  <!-- mission planning module -->
+  <group>
+    <push-ros-namespace namespace="planning/mission_planning"/>
+    <arg name="mission_planner_param_path" default="$(find-pkg-share autoware_launch)/config/planning/mission_planning/mission_planner/mission_planner.param.yaml"/>
+    <include file="$(find-pkg-share mission_planner)/launch/mission_planner.launch.xml"/>
+    <include file="$(find-pkg-share mission_planner)/launch/goal_pose_visualizer.launch.xml"/>
+  </group>
+  <group>
+    <!-- common -->
+    <arg name="common_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/common/common.param.yaml"/>
+    <arg name="nearest_search_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/common/nearest_search.param.yaml"/>
+    <!-- motion velocity smoother -->
+    <arg name="motion_velocity_smoother_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/common/motion_velocity_smoother/motion_velocity_smoother.param.yaml"/>
+    <arg name="smoother_type" default="JerkFiltered" description="options: JerkFiltered, L2, Analytical, Linf(Unstable)"/>
+    <arg name="smoother_type_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/common/motion_velocity_smoother/$(var smoother_type).param.yaml"/>
+    <!-- rtc -->
+    <arg name="rtc_auto_mode_manager_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/rtc_auto_mode_manager/rtc_auto_mode_manager.param.yaml" />
+    <!-- behavior path planner -->
+    <arg name="side_shift_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/side_shift/side_shift.param.yaml" />
+    <arg name="avoidance_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/avoidance/avoidance.param.yaml"/>
+    <arg name="lane_change_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/lane_change/lane_change.param.yaml" />
+    <arg name="lane_following_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/lane_following/lane_following.param.yaml" />
+    <arg name="pull_over_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/pull_over/pull_over.param.yaml"/>
+    <arg name="pull_out_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/pull_out/pull_out.param.yaml"/>
+    <arg name="drivable_area_expansion_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/drivable_area_expansion.param.yaml" />
+    <arg name="behavior_path_planner_tree_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/behavior_path_planner_tree.xml" />
+    <arg name="behavior_path_planner_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_path_planner/behavior_path_planner.param.yaml" />
+
+    <!-- behavior velocity planner -->
+    <arg name="behavior_velocity_smoother_type_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/common/motion_velocity_smoother/Analytical.param.yaml"/>
+    <arg name="blind_spot_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/blind_spot.param.yaml"/>
+    <arg name="crosswalk_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/crosswalk.param.yaml"/>
+    <arg name="detection_area_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/detection_area.param.yaml" />
+    <arg name="intersection_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/intersection.param.yaml"/>
+    <arg name="stop_line_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/stop_line.param.yaml"/>
+    <arg name="traffic_light_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/traffic_light.param.yaml"/>
+    <arg name="virtual_traffic_light_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/virtual_traffic_light.param.yaml" />
+    <arg name="occlusion_spot_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/occlusion_spot.param.yaml" />
+    <arg name="no_stopping_area_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/no_stopping_area.param.yaml" />
+    <arg name="run_out_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/run_out.param.yaml"/>
+    <arg name="speed_bump_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/speed_bump.param.yaml"/>
+    <arg name="behavior_velocity_planner_param_path" default="$(find-pkg-share autoware_launch)/config/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/behavior_velocity_planner.param.yaml" />
+    <group>
+      <push-ros-namespace namespace="planning/scenario_planning/lane_driving/behavior_planning"/>
+      <arg name="vehicle_param_file" default="$(find-pkg-share $(var vehicle_model)_description)/config/vehicle_info.param.yaml"/>
+      <include file="$(find-pkg-share tier4_planning_launch)/launch/scenario_planning/lane_driving/behavior_planning/behavior_planning.launch.py">
+        <arg name="vehicle_param_file" value="$(var vehicle_param_file)"/>
+        <arg name="use_multithread" value="true"/>
+        <arg name="use_pointcloud_container" value="$(var use_pointcloud_container)"/>
+        <arg name="container_name" value="$(var pointcloud_container_name)"/>
+        <arg name="use_experimental_lane_change_function" value="false"/>
+      </include>
+    </group>
+  </group>
+
+
+  <group>
+    <push-ros-namespace namespace="planning"/>
+    <include file="$(find-pkg-share scenario_selector)/launch/scenario_selector.launch.xml">
+      <arg name="input_lane_driving_trajectory" value="/planning/scenario_planning/lane_driving/trajectory"/>
+      <arg name="input_parking_trajectory" value="/planning/scenario_planning/parking/trajectory"/>
+      <arg name="input_lanelet_map" value="/map/vector_map"/>
+      <arg name="input_route" value="/planning/mission_planning/route"/>
+      <arg name="input_odometry" value="/localization/kinematic_state"/>
+      <arg name="output_scenario" value="/planning/scenario_planning/scenario"/>
+      <arg name="output_trajectory" value="/planning/scenario_planning/scenario_selector/trajectory"/>
+      <arg name="is_parking_completed" value="/planning/scenario_planning/parking/is_completed"/>
+    </include>
+  </group>
+
 </launch>
